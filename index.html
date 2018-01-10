@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <form action="">
+        <input type="text" name="name" placeholder="name" required minlength="3">
+        <br>
+        <input type="email" name="email" placeholder="email" required>
+        <br>
+        <input type="text" name="cpf" placeholder="cpf">
+        <br>
+        <input type="text" name="cnpj" placeholder="cnpj">
+        <br>
+        <input type="submit">
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="jquery.validation/jquery.validate.min.js"></script>
+    <script src="jquery.validation/localization/messages_pt_BR.min.js"></script>
+    <script>
+        jQuery.validator.addMethod('cpfValidation', function (value) {
+            value = value.replace(/\./g, '');
+            value = value.replace('-', '');
+
+            if (/\D/.test(value)) {
+                console.log('tem letras', value);
+                return false;
+            }
+
+            if (value.length !== 11) {
+                console.log('tamanho diferente de 11', value.length);
+                return false;
+            }
+
+            if (/^(.)\1+$/.test(value)) {
+                console.log('caracteres iguais', value);
+                return false;
+            }
+
+            let primeiroDigito = 0;
+            let peso = 10;
+
+            for (let i = 0; i < 9; i ++) {
+                primeiroDigito += value.charAt(i) * peso;
+                --peso;
+            }
+
+            primeiroDigito = 11 - (primeiroDigito % 11);
+
+            if (primeiroDigito > 9) {
+                primeiroDigito = 0;
+            }
+
+            let segundoDigito = 0;
+            peso = 11;
+
+            for (let i = 0; i < 10; i ++) {
+                segundoDigito += value.charAt(i) * peso;
+                --peso;
+            }
+
+            segundoDigito = 11 - (segundoDigito % 11);
+
+            if (segundoDigito > 9) {
+                segundoDigito = 0;
+            }
+
+            if (value.charAt(9) != primeiroDigito || value.charAt(10) != segundoDigito) {
+                console.log('Digito de verificação inválido: ' + primeiroDigito + '' + segundoDigito)
+                return false;
+            }
+
+            return true;
+        }, 'CPF inválido');
+
+        jQuery.validator.addMethod('cnpjValidation', function (value) {
+            value = value.replace(/\./g, '');
+            value = value.replace('-', '');
+            value = value.replace('/', '');
+
+            if (/\D/.test(value)) {
+                console.log('tem letras', value);
+                return false;
+            }
+
+            if (value.length !== 14) {
+                console.log('tamanho diferente de 14', value.length);
+                return false;
+            }
+
+            if (/^(.)\1+$/.test(value)) {
+                console.log('caracteres iguais', value);
+                return false;
+            }
+
+            let primeiroDigito = 0;
+            let peso = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+            for (let i = 0; i < 12; i ++) {
+                primeiroDigito += value.charAt(i) * peso[i];
+            }
+
+            primeiroDigito = 11 - (primeiroDigito % 11);
+
+            if (primeiroDigito > 9) {
+                primeiroDigito = 0;
+            }
+
+            let segundoDigito = 0;
+            peso = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+            for (let i = 0; i < 13; i ++) {
+                segundoDigito += value.charAt(i) * peso[i];;
+            }
+
+            segundoDigito = 11 - (segundoDigito % 11);
+
+            if (segundoDigito > 9) {
+                segundoDigito = 0;
+            }
+
+            if (value.charAt(12) != primeiroDigito || value.charAt(13) != segundoDigito) {
+                console.log('Digito de verificação inválido: ' + primeiroDigito + '' + segundoDigito)
+                return false;
+            }
+
+            return true;
+        }, 'CNPJ inválido');
+
+        $('form').validate({
+            rules: {
+                cpf: {
+                    cpfValidation: true
+                },
+                cnpj: {
+                    cnpjValidation: true
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
